@@ -1,12 +1,18 @@
-const http = require("http");
+const express = require('express');
+const bodyParser = require('body-parser');
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/plain");
-  res.end("Hello, Node.js 서버가 실행되었습니다!");
-});
+const app = express();
 
-const PORT = 3000;
-server.listen(PORT, () => {
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
+
+const indexRouter = require('./routes');
+app.use('/', indexRouter);
+
+const PORT = 3002;
+app.listen(PORT, () => {
   console.log(`server start: ${PORT}`);
 });
