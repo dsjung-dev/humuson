@@ -21,7 +21,7 @@ const readAllOrders = (req, res) => {
 
 const readOrderById = (req, res) => {
   try {
-    const order = orderService.orderById(req.params.id);
+    const order = orderService.readOrderbyId(req.params.id);
     res.status(200).json(order);
   } catch (error) {
     errorHandler(res, error);
