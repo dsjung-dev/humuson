@@ -28,8 +28,20 @@ const readOrderById = (req, res) => {
   }
 };
 
+// 외부 API로부터 특정 시스템의 데이터 수집
+const fetchExternalOrders = async (req, res) => {
+  const { system } = req.body; // systemA, systemB 중 선택
+  try {
+    const result = await orderService.fetchOrdersFromExternalSystem(system);
+    res.status(200).json(result);
+  } catch (error) {
+    errorHandler(res, error);
+  }
+};
+
 module.exports = {
   createOrder,
   readAllOrders,
   readOrderById,
+  fetchExternalOrders,
 };
