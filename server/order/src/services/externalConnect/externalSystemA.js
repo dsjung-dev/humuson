@@ -1,6 +1,7 @@
 const axios = require('axios');
 const ExternalSystemInterface = require('./externalSystemInterface');
 const Order = require('../../services/order/orderModel');
+const handleNetworkError = require('./networkErrorHandler');
 
 class ExternalSystemA extends ExternalSystemInterface {
   async fetchOrders() {
