@@ -1,12 +1,39 @@
 const axios = require('axios');
+const Ajv = require('ajv');
 const ExternalSystemInterface = require('./externalSystemInterface');
-const Order = require('../../services/order/orderModel');
+const { Order, ORDER_STATUS } = require('../../services/order/orderModel');
 const handleNetworkError = require('./networkErrorHandler');
+
+// 주문 데이터 스키마
+const orderSchema = {
+  type: 'object',
+  properties: {
+    id: { type: 'string', minLength: 1, maxLength: 10 },
+    customerName: { type: 'string', minLength: 1, maxLength: 20 },
+    orderDate: {
+      type: 'string',
+      pattern: '^\\d{4}-\\d{2}-\\d{2}$',
+      errorMessage: {
+        pattern: '주문 날짜 형식은 YYYY-MM-DD 이어야 합니다.',
+      },
+    },
+    status: {
+      type: 'string',
+      enum: ['처리 중', '배송 중', '완료'],
+      errorMessage: {
+        enum: '상태는 "처리 중", "배송 중", "완료" 중 하나여야 합니다.',
+      },
+    },
+  },
+  required: ['id', 'customerName', 'orderDate', 'status'],
+  additionalProperties: false,
+};
 
 class ExternalSystemA extends ExternalSystemInterface {
   constructor() {
     super();
     this.systemId = 'systemA';
+    this.validate = new Ajv({ allErrors: true }).compile(orderSchema);
   }
 
   async fetchOrders() {
@@ -25,40 +52,38 @@ class ExternalSystemA extends ExternalSystemInterface {
 
       return convertedOrders;
     } catch (error) {
-      handleNetworkError(this.systemId, error);
+      handleNetworkError(error);
     }
   }
 
-  convert(systemId, order) {
+  convert(order) {
+    const statusConvert = (status) => {
+      switch (status) {
+        case '처리 중':
+          return ORDER_STATUS.PROCESSING;
+        case '배송 중':
+          return ORDER_STATUS.ON_DELIVERY;
+        case '완료':
+          return ORDER_STATUS.COMPLETED;
+      }
+    };
+
     return new Order(
       this.systemId,
       order.id,
       order.customer,
       order.date,
-      order.status
+      statusConvert(order.status)
     );
   }
 
   validateOrder(order) {
-    const requiredFields = ['id', 'customerName', 'orderDate', 'status'];
-
-    for (const field of requiredFields) {
-      if (!order[field]) {
-        console.error(`주문 데이터 오류: 필수 필드 누락 (${field})`);
-        return false;
-      }
-    }
-
-    // 주문 상태 검증 (예: 처리 중, 배송 중, 완료)
-    const validStatuses = ['처리 중', '배송 중', '완료'];
-    if (!validStatuses.includes(order.status)) {
-      console.error(`주문 데이터 오류: 잘못된 주문 상태 (${order.status})`);
-      return false;
-    }
-
-    // 주문 날짜 형식 검증 (YYYY-MM-DD)
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(order.orderDate)) {
-      console.error(`주문 데이터 오류: 잘못된 날짜 형식 (${order.orderDate})`);
+    const isValid = this.validate(order);
+    if (!isValid) {
+      console.log(`주문 데이터 오류: ${JSON.stringify(order, null, 2)}`);
+      console.warn(
+        `에러 내용: ${JSON.stringify(this.validate.errors, null, 2)}`
+      );
       return false;
     }
 

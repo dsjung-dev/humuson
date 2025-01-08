@@ -1,6 +1,7 @@
 const Order = require('./orderModel');
 const { ExternalSystemFactory } = require('../externalConnect');
 
+// db 레이어 생략
 const orders = [];
 
 const createOrder = (orderData) => {
@@ -21,6 +22,7 @@ const readAllOrders = () => {
 
 const readOrderbyId = (orderId) => {
   const order = orders.find((o) => o.orderId === orderId);
+
   return order;
 };
 
