@@ -47,13 +47,16 @@ server/order> node src/app.js
 │   ├── routes
 │   │   └── api
 │   │       ├── index.js            // 라우터 정의
-│   │       └── orderController.js  // 주문 관련 컨트롤러
+│   │       └── orderController.js  // 주문 관련 컨트롤러 (응답 처리)
 │   ├── services
-│   │   ├── externalConnect // 외부 연동을 위한 서비스 로직
-│   │   └── order           // 주문 관련 서비스 로직
+│   │   ├── externalConnect     // 외부 연동을 위한 서비스 로직
+│   │   └── order               // 주문 관련 서비스 로직
+│   │       └── orderModel.js   // 내부에서 관리하는 order 데이터 정의
 │   └── utils
-├── .env                    // PORT, API_KEYS 등 정의
+├── .env                        // PORT, API_KEYS 등 정의
+├── app.js                      // app 정의 및 서버 실행
 └── package.json
+
 ```
 
 ## 클래스
