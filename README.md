@@ -30,6 +30,9 @@ server/order> node src/app.js
 
 ## 테스트 수행 방법
 
+> 참고: postman collection import하여 사용 가능
+> (tool > \_humonson.postman_collection.json)
+
 1. 외부 시스템(systemB)으로부터 데이터를 가져와서 저장
 
 ```
