@@ -22,6 +22,13 @@ const readAllOrders = (req, res) => {
 const readOrderById = (req, res) => {
   try {
     const order = orderService.readOrderbyId(req.params.id);
+    if (!order) {
+      res
+        .status(404)
+        .json({ message: `${req.params.id} 주문을 찾을 수 없습니다.` });
+      return;
+    }
+
     res.status(200).json(order);
   } catch (error) {
     errorHandler(res, error);

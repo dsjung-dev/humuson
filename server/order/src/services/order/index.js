@@ -21,9 +21,6 @@ const readAllOrders = () => {
 
 const readOrderbyId = (orderId) => {
   const order = orders.find((o) => o.orderId === orderId);
-  if (!order) {
-    throw new Error('주문을 찾을 수 없습니다.');
-  }
   return order;
 };
 

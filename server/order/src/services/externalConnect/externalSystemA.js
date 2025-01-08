@@ -4,6 +4,11 @@ const Order = require('../../services/order/orderModel');
 const handleNetworkError = require('./networkErrorHandler');
 
 class ExternalSystemA extends ExternalSystemInterface {
+  constructor() {
+    super();
+    this.systemId = 'systemA';
+  }
+
   async fetchOrders() {
     try {
       const response = await axios.get('http://systemA.com/api/orders', {
@@ -20,12 +25,18 @@ class ExternalSystemA extends ExternalSystemInterface {
 
       return convertedOrders;
     } catch (error) {
-      handleNetworkError('SystemA', error);
+      handleNetworkError(this.systemId, error);
     }
   }
 
-  convert(order) {
-    return new Order(order.order_id, order.customer, order.date, order.status);
+  convert(systemId, order) {
+    return new Order(
+      this.systemId,
+      order.id,
+      order.customer,
+      order.date,
+      order.status
+    );
   }
 
   validateOrder(order) {
